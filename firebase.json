@@ -1,7 +1,7 @@
 {
   "firestore": [
     {
-      "database": "ai-studio-android-wordligh-5ca335cd-2f1f-497a-b7bb-2021e1d6149e",
+      "database": "ai-studio-android-wordligh-6c38febb-2572-4fb1-840d-e10fc09376b8",
       "rules": "firestore.rules"
     }
   ],
