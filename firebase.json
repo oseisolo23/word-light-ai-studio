@@ -1,0 +1,36 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-android-wordligh-5ca335cd-2f1f-497a-b7bb-2021e1d6149e",
+      "rules": "firestore.rules"
+    }
+  ],
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "backend",
+    "runtime": "nodejs20"
+  },
+  "emulators": {
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8085
+    },
+    "storage": {
+      "host": "127.0.0.1",
+      "port": 9199
+    },
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5001
+    },
+    "ui": {
+      "enabled": false
+    }
+  }
+}
