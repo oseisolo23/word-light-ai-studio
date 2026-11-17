@@ -89,8 +89,19 @@ jobs:
           yes | "$SDKMANAGER_BIN" --sdk_root="$SDK_DIR" --licenses >/dev/null 2>&1 || true
           set -o pipefail
 
-          "$SDKMANAGER_BIN" --sdk_root="$SDK_DIR" --install "cmdline-tools;latest" "platform-tools" "build-tools;36.0.0" "platforms;android-36" "platforms;android-36.1" || true
+          "$SDKMANAGER_BIN" --sdk_root="$SDK_DIR" --install "cmdline-tools;latest" || true
+          if [ -x "${SDK_DIR}/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDKMANAGER_BIN="${SDK_DIR}/cmdline-tools/latest/bin/sdkmanager"
+          fi
+          echo "Active sdkmanager: ${SDKMANAGER_BIN}"
+
+          set +o pipefail
+          yes | "$SDKMANAGER_BIN" --sdk_root="$SDK_DIR" --licenses >/dev/null 2>&1 || true
+          set -o pipefail
+
+          "$SDKMANAGER_BIN" --sdk_root="$SDK_DIR" --install "platform-tools" "build-tools;36.0.0" "platforms;android-36" "platforms;android-36.1" || true
           ls -la "${SDK_DIR}/platforms" || true
+          ls -la "${SDK_DIR}/build-tools" || true
 
       - name: Set up Gradle 9.3.1
         id: setup_gradle
@@ -130,7 +141,10 @@ jobs:
 
       - name: Build debug APK
         id: build_apk
-        run: gradle :app:assembleDebug --stacktrace --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle :app:assembleDebug --stacktrace --no-daemon 2>&1 | tee "${RUNNER_TEMP}/gradle-build.log"
 
       - name: Verify debug APK
         id: verify_apk
@@ -295,5 +309,13 @@ jobs:
               echo "- **Build debug APK:** \`${BUILD_OUTCOME}\`"
               echo "- **Verify debug APK:** \`${VERIFY_OUTCOME}\`"
               echo "- **Upload artifact:** \`${ARTIFACT_OUTCOME}\`"
+              if [ -f "${RUNNER_TEMP}/gradle-build.log" ]; then
+                echo ""
+                echo "### Gradle Build Error Excerpt"
+                echo ""
+                echo '```text'
+                tail -n 45 "${RUNNER_TEMP}/gradle-build.log"
+                echo '```'
+              fi
             } >> "$GITHUB_STEP_SUMMARY"
           fi
